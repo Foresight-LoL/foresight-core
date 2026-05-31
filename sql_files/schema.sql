@@ -3,9 +3,7 @@ CREATE TABLE IF NOT EXISTS players(
     game_name TEXT,
     tag_line  TEXT,
     region   TEXT,
-    profile_icon_id INT,
-    revision_date TIMESTAMP,
-    last_synced_at TIMESTAMP
+    synced_at TIMESTAMP
 );
 CREATE TYPE ChallengePointDto AS(
     level TEXT,
@@ -20,6 +18,7 @@ CREATE TABLE IF NOT EXISTS player_snapshots(
      summoner_level INT,
      title TEXT,
 
+     profile_icon_id INT,
      crest_border TEXT,
      banner_accent TEXT,
      prestige_crest_border_level INT,
