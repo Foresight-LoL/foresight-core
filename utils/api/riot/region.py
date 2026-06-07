@@ -31,6 +31,12 @@ class Region(StrEnum):
 
         return None
 
+    def get_base_url(self):
+        return f"https://{self.value.lower()}.api.riotgames.com"
+
+    def get_higher_level_base_url(self):
+        return f"https://{self.get_higher_level_region().value.lower()}.api.riotgames.com"
+
     # AMERICAS
     AMERICAS = "AMERICAS"
 
