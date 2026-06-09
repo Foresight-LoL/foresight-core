@@ -1,83 +1,121 @@
-CREATE TABLE IF NOT EXISTS players(
-    puuid TEXT PRIMARY KEY NOT NULL,
-    game_name TEXT,
-    tag_line  TEXT,
-    region   TEXT,
-    synced_at TIMESTAMP
-);
-CREATE TYPE ChallengePointDto AS(
-    level TEXT,
-    current BIGINT,
-    max BIGINT,
-    percentile REAL
-                             );
-CREATE TABLE IF NOT EXISTS player_snapshots(
-     puuid TEXT NOT NULL,
-     snapshot_date DATE NOT NULL,
-
-     summoner_level INT,
-     title TEXT,
-
-     profile_icon_id INT,
-     crest_border TEXT,
-     banner_accent TEXT,
-     prestige_crest_border_level INT,
-
-     total_points ChallengePointDto,
-
-     PRIMARY KEY(puuid, snapshot_date),
-     FOREIGN KEY(puuid) REFERENCES players(puuid) ON DELETE CASCADE
+create type challengepointdto as
+(
+    level      text,
+    current    bigint,
+    max        bigint,
+    percentile real
 );
 
-CREATE TABLE IF NOT EXISTS masteries(
-    puuid TEXT NOT NULL,
-    champion_id BIGINT NOT NULL,
+alter type challengepointdto owner to neondb_owner;
 
-    champion_points_until_next_level INT,
-    chest_granted BOOLEAN,
-    last_play_time TIMESTAMP,
-    champion_level INT,
-    champion_points INT,
-    champion_points_since_last_level INT,
-    mark_required_for_next_level INT,
-    champion_season_milestone INT,
-    tokens_earned INT,
-    milestone_grades TEXT[],
-
-    PRIMARY KEY (puuid, champion_id),
-    FOREIGN KEY (puuid) REFERENCES players (puuid) ON DELETE CASCADE
+create type test_dto as
+(
+    number integer
 );
 
-CREATE TABLE IF NOT EXISTS challenges(
-    puuid TEXT NOT NULL,
-    challenge_id BIGINT NOT NULL,
+alter type test_dto owner to neondb_owner;
 
-    percentile REAL,
-    players_in_level INT,
-    achieved_time TIMESTAMP,
-    value REAL,
-    level TEXT,
-    position INT,
-
-    PRIMARY KEY(puuid, challenge_id),
-    FOREIGN KEY(puuid) REFERENCES players (puuid) ON DELETE CASCADE
+create table players
+(
+    puuid     text not null
+        primary key,
+    game_name text,
+    tag_line  text,
+    region    text,
+    synced_at timestamp with time zone
 );
 
-CREATE TABLE IF NOT EXISTS ranks(
-    puuid TEXT NOT NULL,
-    queue_type TEXT NOT NULL,
-    snapshot_date DATE NOT NULL,
+alter table players
+    owner to neondb_owner;
 
-    tier TEXT,
-    rank TEXT,
-    league_points INT,
-    wins INT,
-    losses INT,
-    hot_streak BOOLEAN,
-    veteran BOOLEAN,
-    fresh_blood BOOLEAN,
-    inactive BOOLEAN,
+create table masteries
+(
+    puuid                            text   not null
+        references players
+            on delete cascade,
+    champion_id                      bigint not null,
+    champion_points_until_next_level integer,
+    chest_granted                    boolean,
+    last_play_time                   timestamp with time zone,
+    champion_level                   integer,
+    champion_points                  integer,
+    champion_points_since_last_level integer,
+    mark_required_for_next_level     integer,
+    champion_season_milestone        integer,
+    tokens_earned                    integer,
+    milestone_grades                 text[],
+    primary key (puuid, champion_id)
+);
 
-    PRIMARY KEY(puuid, queue_type, snapshot_date),
-    FOREIGN KEY(puuid, snapshot_date) REFERENCES player_snapshots(puuid, snapshot_date) ON DELETE CASCADE
-)
+alter table masteries
+    owner to neondb_owner;
+
+create table challenges
+(
+    puuid            text   not null
+        references players
+            on delete cascade,
+    challenge_id     bigint not null,
+    percentile       real,
+    players_in_level integer,
+    achieved_time    timestamp with time zone,
+    value            real,
+    level            text,
+    position         integer,
+    primary key (puuid, challenge_id)
+);
+
+alter table challenges
+    owner to neondb_owner;
+
+create table player_snapshots
+(
+    puuid                       text not null
+        references players
+            on delete cascade,
+    snapshot_date               date not null,
+    summoner_level              integer,
+    title                       text,
+    profile_icon_id             integer,
+    crest_border                text,
+    banner_accent               text,
+    prestige_crest_border_level integer,
+    total_points                challengepointdto,
+    primary key (puuid, snapshot_date)
+);
+
+alter table player_snapshots
+    owner to neondb_owner;
+
+create table rank_snapshots
+(
+    puuid         text                     not null
+        references players
+            on delete cascade,
+    queue_type    text                     not null,
+    snapshot_time timestamp with time zone not null,
+    tier          text,
+    rank          text,
+    league_points integer,
+    wins          integer,
+    losses        integer,
+    hot_streak    boolean,
+    veteran       boolean,
+    fresh_blood   boolean,
+    inactive      boolean,
+    primary key (puuid, queue_type, snapshot_time)
+);
+
+alter table rank_snapshots
+    owner to neondb_owner;
+
+create table test_table
+(
+    id       integer not null
+        primary key,
+    dto_test test_dto
+);
+
+alter table test_table
+    owner to neondb_owner;
+
