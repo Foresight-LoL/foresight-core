@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Self
 
 import aiohttp
 
@@ -19,7 +19,7 @@ class RiotAPIResponse:
         return 200 <= self.status < 300
 
     @classmethod
-    async def from_response(cls, response: aiohttp.ClientResponse) -> "RiotAPIResponse":
+    async def from_response(cls, response: aiohttp.ClientResponse) -> Self:
         return cls(
             headers=dict(response.headers),
             data=await response.json(),
@@ -31,7 +31,7 @@ class RiotAPIResponse:
         )
 
     @classmethod
-    async def error_response(cls, response: aiohttp.ClientResponse) -> "RiotAPIResponse":
+    async def error_response(cls, response: aiohttp.ClientResponse) -> Self:
         try:
             data = await response.json()
         except Exception:
